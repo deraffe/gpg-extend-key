@@ -15,8 +15,9 @@ status() {
 }
 
 run() {
-  echo2 "+ $*"
+  set -x
   "$@"
+  set +x
 }
 
 extend() {
@@ -26,7 +27,16 @@ extend() {
   run gpg --quick-set-expire "$keyid" "$extension"
   status "Setting expiration of subkeys..."
   run gpg --quick-set-expire "$keyid" "$extension" '*'
-  status "Done."
+  status "Key has been extended."
+}
+
+upload() {
+  keyid="${1}"
+  status "Uploading key..."
+  set -x
+  gpg --export "$keyid" | curl -T - https://keys.openpgp.org
+  set +x
+  status "Key has been uploaded. Please visit the verification link above."
 }
 
 case "$1" in
@@ -39,5 +49,6 @@ case "$1" in
     ;;
   *)
     extend "$@"
+    upload "$1"
     ;;
 esac
