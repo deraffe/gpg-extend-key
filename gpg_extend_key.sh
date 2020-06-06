@@ -46,6 +46,13 @@ upload_openpgp() {
   status "Key has been uploaded to keys.openpgp.org. Please visit the verification link above."
 }
 
+lint() {
+  keyid="${1}"
+  status "Checking key..."
+  gpg --export-secret-keys "$keyid" | hokey lint
+  status "Done. If you see any red parts above, please update your key."
+}
+
 case "$1" in
   '')
     usage
@@ -58,5 +65,6 @@ case "$1" in
     extend "$@"
     upload_sks "$1"
     upload_openpgp "$1"
+    lint "$1"
     ;;
 esac
