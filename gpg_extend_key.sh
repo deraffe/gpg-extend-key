@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-
+# Keep in mind that errexit does not work inside if statements
 set -euo pipefail
+# use the same options for subshells
+export SHELLOPTS
 
 usage() {
   echo "${BASH_SOURCE[0]} keyid [extension period]"
@@ -15,9 +17,10 @@ status() {
 }
 
 run() {
-  set -x
-  "$@"
-  set +x
+  (
+    set -x
+    "$@"
+  )
 }
 
 extend() {
@@ -40,9 +43,10 @@ upload_sks() {
 upload_openpgp() {
   keyid="${1}"
   status "Uploading key to keys.openpgp.org..."
-  set -x
-  gpg --export "$keyid" | curl -T - https://keys.openpgp.org
-  set +x
+  (
+    set -x
+    gpg --export "$keyid" | curl -T - https://keys.openpgp.org
+  )
   status "Key has been uploaded to keys.openpgp.org. Please visit the verification link above."
 }
 
