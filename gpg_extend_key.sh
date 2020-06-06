@@ -30,13 +30,20 @@ extend() {
   status "Key has been extended."
 }
 
-upload() {
+upload_sks() {
   keyid="${1}"
-  status "Uploading key..."
+  status "Uploading key to the SKS pool..."
+  run gpg --keyserver hkps://hkps.pool.sks-keyservers.net --send-keys "$keyid"
+  status "Uploaded key to the SKS pool."
+}
+
+upload_openpgp() {
+  keyid="${1}"
+  status "Uploading key to keys.openpgp.org..."
   set -x
   gpg --export "$keyid" | curl -T - https://keys.openpgp.org
   set +x
-  status "Key has been uploaded. Please visit the verification link above."
+  status "Key has been uploaded to keys.openpgp.org. Please visit the verification link above."
 }
 
 case "$1" in
@@ -49,6 +56,7 @@ case "$1" in
     ;;
   *)
     extend "$@"
-    upload "$1"
+    upload_sks "$1"
+    upload_openpgp "$1"
     ;;
 esac
