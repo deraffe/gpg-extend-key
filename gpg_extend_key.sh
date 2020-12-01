@@ -57,7 +57,7 @@ lint() {
   status "Done. If you see any red parts above, please update your key."
 }
 
-case "$1" in
+case "${1:-}" in
   '')
     usage
     exit 1
@@ -67,8 +67,8 @@ case "$1" in
     ;;
   *)
     extend "$@"
-    upload_sks "$1"
-    upload_openpgp "$1"
-    lint "$1"
+    upload_sks "${1}"
+    upload_openpgp "${1}"
+    lint "${1}"
     ;;
 esac
