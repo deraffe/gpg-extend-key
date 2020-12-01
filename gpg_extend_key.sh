@@ -67,8 +67,8 @@ case "${1:-}" in
     ;;
   *)
     extend "$@"
-    upload_sks "${1}"
-    upload_openpgp "${1}"
-    lint "${1}"
+    upload_sks "${1}" || echo2 "Uploading to SKS keyservers failed."
+    upload_openpgp "${1}" || echo2 "Uploading to OpenPGP keyserver failed."
+    lint "${1}" || echo2 "Linting failed."
     ;;
 esac
