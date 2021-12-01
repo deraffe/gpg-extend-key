@@ -29,7 +29,15 @@ extend() {
   status "Setting expiration of main key..."
   run gpg --quick-set-expire "$keyid" "$extension"
   status "Setting expiration of subkeys..."
-  run gpg --quick-set-expire "$keyid" "$extension" '*'
+  local -a subkeyids
+  readarray -t subkeyids < <(gpg --list-keys --list-options show-unusable-subkeys --with-subkey-fingerprints --with-colons "$keyid" | awk -F: '/^fpr/{print $10}')
+  for subfpr in "${subkeyids[@]}"; do
+    if [[ $subfpr == "$keyid" ]]; then
+      continue
+    fi
+    status "...subkey $subfpr..."
+    run gpg --quick-set-expire "$keyid" "$extension" "$subfpr"
+  done
   status "Key has been extended."
 }
 
